@@ -40,16 +40,31 @@ module RailsConfig
     Kernel.const_set(RailsConfig.const_name, RailsConfig.load_files(files))
   end
 
+  # def self.setting_files(config_root, env)
+  #   [
+  #     File.join(config_root, "settings.yml").to_s,
+  #     File.join(config_root, "settings", "#{env}.yml").to_s,
+  #     File.join(config_root, "environments", "#{env}.yml").to_s,
+  #
+  #     File.join(config_root, "settings.local.yml").to_s,
+  #     File.join(config_root, "settings", "#{env}.local.yml").to_s,
+  #     File.join(config_root, "environments", "#{env}.local.yml").to_s
+  #   ].freeze
+  # end
   def self.setting_files(config_root, env)
     [
       File.join(config_root, "settings.yml").to_s,
       File.join(config_root, "settings", "#{env}.yml").to_s,
+      Dir.glob(File.join(config_root, "settings", env, "*.yml").to_s).reject { |f| f.ends_with?('local.yml') },
       File.join(config_root, "environments", "#{env}.yml").to_s,
+      Dir.glob(File.join(config_root, "environments", env, "*.yml").to_s).reject { |f| f.ends_with?('local.yml') },
 
       File.join(config_root, "settings.local.yml").to_s,
       File.join(config_root, "settings", "#{env}.local.yml").to_s,
-      File.join(config_root, "environments", "#{env}.local.yml").to_s
-    ].freeze
+      Dir.glob(File.join(config_root, "settings", env, "*.local.yml").to_s),
+      File.join(config_root, "environments", "#{env}.local.yml").to_s,
+      Dir.glob(File.join(config_root, "environments", env, "*.local.yml").to_s)
+    ].flatten.freeze
   end
 
   def self.reload!
